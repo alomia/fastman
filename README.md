@@ -1,1 +1,1 @@
-# FastMan CLI
+# Fastman CLI
