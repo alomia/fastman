@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/alomia/fastman/pkg/sampledata"
 )
 
 func CreateFile(path string, content ...[]byte) error {
@@ -54,6 +56,47 @@ func CreatePackage(path string) error {
 	initFilePath := filepath.Join(path, "__init__.py")
 	if err := CreateFile(initFilePath); err != nil {
 		return fmt.Errorf("error creating __init__.py file in package \"%s\": %w", namePackage, err)
+	}
+
+	return nil
+}
+
+func FileOrDirExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+
+	return false, fmt.Errorf("error verifying the existence of the file or directory: %v", err)
+}
+
+func CreateConfigFile(currentDir string) error {
+	configFileName := "fastmanconf.yaml"
+	content, err := sampledata.GetSampleContent(configFileName)
+	if err != nil {
+		return err
+	}
+
+	configFilePath := filepath.Join(currentDir, configFileName)
+
+	exists, err := FileOrDirExists(configFilePath)
+	if err != nil {
+		return err
+	}
+
+	err = CreateFile(configFilePath, []byte(content))
+	if err != nil {
+		return err
+	}
+
+	if exists {
+		fmt.Printf("fastman reset in: %s\n", currentDir)
+	} else {
+		fmt.Printf("fastman initialized in: %s\n", currentDir)
 	}
 
 	return nil

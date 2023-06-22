@@ -1,82 +1,51 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/alomia/fastman/pkg/fileutils"
-	"github.com/alomia/fastman/pkg/projectmanager"
-	"github.com/alomia/fastman/pkg/sampledata"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
-// initCmd represents the init command
 var initCmd = &cobra.Command{
 	Use:   "init [directory-name]",
-	Short: "initialize a new FastAPI project",
-	Long: `Create the basic directory, package, and file structure to start working with a FastAPI project.
-The command initializes a new FastAPI project by setting up the necessary directories and files, allowing you to quickly get started with development.
-
+	Short: "initialize fastman",
+	Long: `Initialize Fastman by creating a configuration file called "fastman.yaml" in the specified directory.
+The configuration file contains the necessary information for Fastman to function properly.
+	
 Examples:
-fastman init
-fastman init project-name`,
+	fastman init
+	fastman init [directory-name]`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		path, err := os.Getwd()
+		currentDir, err := os.Getwd()
 		if err != nil {
 			return err
 		}
 
 		if len(args) > 0 {
 			directory := args[0]
-			path = filepath.Join(path, directory)
-			fileutils.CreateDirectory(path)
+
+			targetDir := filepath.Join(currentDir, directory)
+
+			exists, err := fileutils.FileOrDirExists(targetDir)
+			if err != nil {
+				return err
+			}
+
+			if !exists {
+				fmt.Printf("Directory '%s' does not exist.\n", directory)
+				return nil
+			}
+
+			currentDir = targetDir
 		}
 
-		configFileName := "config.yaml"
-		content, err := sampledata.GetSampleContent(configFileName)
+		err = fileutils.CreateConfigFile(currentDir)
 		if err != nil {
 			return err
 		}
-
-		configFilePath := filepath.Join(path, configFileName)
-		err = fileutils.CreateFile(configFilePath, []byte(content))
-		if err != nil {
-			return err
-		}
-
-		viper.AddConfigPath(path)
-		viper.SetConfigName("config")
-		viper.SetConfigType("yaml")
-
-		err = viper.ReadInConfig()
-		if err != nil {
-			return err
-		}
-
-		packages := []projectmanager.Package{
-			{
-				Name:  "models",
-				Files: []string{"products.py"},
-			},
-			{
-				Name:  "routes",
-				Files: []string{"products.py"},
-			},
-		}
-
-		files := []string{
-			"main.py",
-			"requirements.txt",
-		}
-
-		fastman := projectmanager.NewProjectStructure(
-			path,
-			packages,
-			files,
-		)
-
-		fastman.CreateProjectStructure()
 
 		return nil
 	},

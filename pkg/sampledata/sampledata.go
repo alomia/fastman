@@ -121,7 +121,7 @@ __pycache__/
 
 `
 
-var fileConfig = `packages:
+var fileFastmanconf = `packages:
   name:
     models:
       - products.py
@@ -134,7 +134,7 @@ var sampleContent = map[string]string{
 	"models/products.py": fileModelsProduct,
 	"routes/products.py": fileRoutesProduct,
 	"requirements.txt":   fileRequirements,
-	"config.yaml":        fileConfig,
+	"fastmanconf.yaml":   fileFastmanconf,
 }
 
 func GetSampleContent(fileName string) (string, error) {
