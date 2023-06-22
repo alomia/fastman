@@ -27,6 +27,11 @@ func NewProjectStructure(path string, packages []Package, files []string) *Proje
 }
 
 func (p *ProjectStructure) CreateProjectStructure() error {
+	err := fileutils.CreateConfigFile(p.Path)
+	if err != nil {
+		return err
+	}
+
 	for _, pkg := range p.Packages {
 		pkgPath := filepath.Join(p.Path, pkg.Name)
 
@@ -37,8 +42,9 @@ func (p *ProjectStructure) CreateProjectStructure() error {
 
 		for _, file := range pkg.Files {
 			filePath := filepath.Join(pkgPath, file)
+			fileContentPath := filepath.Join(pkg.Name, file)
 
-			content, err := sampledata.GetSampleContent(filepath.Join(pkg.Name, file))
+			content, err := sampledata.GetSampleContent(fileContentPath)
 			if err != nil {
 				return err
 			}
