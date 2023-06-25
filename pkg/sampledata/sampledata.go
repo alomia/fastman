@@ -121,12 +121,15 @@ __pycache__/
 
 `
 
-var fileFastmanconf = `packages:
-  name:
-    models:
-      - products.py
-    routes:
-      - products.py
+var fileFastmanconf = `# Fastman configuration file
+
+dependencies_file: requirements.txt
+
+scripts:
+  install_package: python -m pip install {{package_name}}
+  install_from_file: python -m pip install -r {{package_file}}
+  uninstall_package: python -m pip uninstall {{package_name}}
+  uninstall_from_file: python -m pip uninstall -r {{package_file}}
 `
 
 var sampleContent = map[string]string{
