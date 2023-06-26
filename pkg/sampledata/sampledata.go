@@ -130,6 +130,8 @@ scripts:
   install_from_file: python -m pip install -r {{package_file}}
   uninstall_package: python -m pip uninstall {{package_name}}
   uninstall_from_file: python -m pip uninstall -r {{package_file}}
+  run:
+    server: python -m main
 `
 
 var sampleContent = map[string]string{
